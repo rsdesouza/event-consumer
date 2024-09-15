@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: eventdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - event_consumer_network
+
+  emqx:
+    image: emqx/emqx:latest
+    container_name: emqx_broker
+    environment:
+      EMQX_NAME: broker
+      EMQX_LISTENER__TCP__EXTERNAL: 1883
+      EMQX_LISTENER__SSL__EXTERNAL: 8883
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "8080:8080"
+    volumes:
+      - emqx_data:/opt/emqx/data
+      - emqx_log:/opt/emqx/log
+    networks:
+      - event_consumer_network
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - event_consumer_network
+
+  java_app:
+    build: .
+    container_name: java_app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/eventdb
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      MQTT_BROKER_URL: tcp://emqx_broker:1883
+    depends_on:
+      - postgres
+      - emqx
+    ports:
+      - "8081:8080"
+    networks:
+      - event_consumer_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - postgres
+      - emqx
+      - java_app
+    networks:
+      - event_consumer_network
+
+volumes:
+  postgres_data:
+  emqx_data:
+  emqx_log:
+  grafana_data:
+
+networks:
+  event_consumer_network:
+    driver: bridge

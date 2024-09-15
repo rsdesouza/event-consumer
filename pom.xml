@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>mpes.cesar.school</groupId>
 	<artifactId>event-consumer</artifactId>
-	<version>1.0.0</version>
+	<version>1</version>
 	<name>event-consumer</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
