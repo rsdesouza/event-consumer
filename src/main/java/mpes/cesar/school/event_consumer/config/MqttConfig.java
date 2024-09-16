@@ -13,7 +13,7 @@ public class MqttConfig {
     @Bean
     public MqttClient mqttClient() {
         try {
-            MqttClient client = new MqttClient("tcp://104.197.9.105:1883", MqttClient.generateClientId(), new MemoryPersistence());
+            MqttClient client = new MqttClient("tcp://emqx:1883", MqttClient.generateClientId(), new MemoryPersistence());
             MqttConnectOptions options = new MqttConnectOptions();
             options.setCleanSession(true);
             client.connect(options);

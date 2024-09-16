@@ -44,7 +44,7 @@ services:
 
   java_app:
     build: .
-    container_name: java_app
+    container_name: java-app
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/eventdb
       SPRING_DATASOURCE_USERNAME: user
