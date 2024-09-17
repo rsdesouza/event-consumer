@@ -10,7 +10,10 @@ scrape_configs:
 
   # Scraping metrics from EMQX (MQTT broker)
   - job_name: 'emqx'
-    metrics_path: '/api/v4/prometheus/stats'
+    metrics_path: '/api/v5/prometheus/stats'
+    basic_auth:
+      username: admin
+      password: public
     static_configs:
       - targets: ['emqx_broker:18083']
 
