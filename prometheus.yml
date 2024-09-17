@@ -2,7 +2,18 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
+  # Scraping metrics from the Java Spring Boot app
   - job_name: 'spring'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['java_app:8080']
+      - targets: ['javaapp:8080']
+
+  # Scraping metrics from EMQX (MQTT broker)
+  - job_name: 'emqx'
+    static_configs:
+      - targets: ['emqx_broker:8080']
+
+  # Scraping metrics from the Postgres exporter
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres_db:9187']  # If using a postgres_exporter on port 9187

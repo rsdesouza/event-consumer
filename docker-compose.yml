@@ -31,11 +31,13 @@ services:
     image: emqx/emqx:latest
     container_name: emqx_broker
     environment:
-      EMQX_NAME: broker
-      EMQX_LISTENER__TCP__EXTERNAL: 1883
-      EMQX_LISTENER__SSL__EXTERNAL: 8883
-      EMQX_PROMETHEUS__EXPORTER__ENABLED: "true"  # Ativar métricas Prometheus
-      EMQX_PROMETHEUS__EXPORTER__LISTENER: "8080" # Porta para exportar métricas
+      - EMQX_NAME=broker
+      - EMQX_LISTENER__TCP__EXTERNAL=1883
+      - EMQX_LISTENER__SSL__EXTERNAL=8883
+      - EMQX_TELEMETRY__PROMETHEUS__ENABLED=true  # Ativar métricas Prometheus
+      - EMQX_TELEMETRY__PROMETHEUS__LISTENER=8080 # Porta para exportar métricas
+      - EMQX_ADMIN_PASSWORD=senha_admin         # Definir senha do administrador
+      - EMQX_ADMIN_USER=admin                   # Definir nome do usuário administrador
     ports:
       - "1883:1883"
       - "8083:8083"
@@ -56,9 +58,9 @@ services:
     networks:
       - event_consumer_network
 
-  java_app:
+  java-app:
     build: .
-    container_name: java-app
+    container_name: javaapp
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/eventdb
       SPRING_DATASOURCE_USERNAME: user
@@ -85,7 +87,7 @@ services:
     depends_on:
       - postgres
       - emqx
-      - java_app
+      - java-app
     networks:
       - event_consumer_network
 
