@@ -13,7 +13,6 @@ scrape_configs:
     static_configs:
       - targets: ['emqx_broker:8080']
 
-  # Scraping metrics from the Postgres exporter
-  - job_name: 'postgres'
+  - job_name: 'postgres_exporter'
     static_configs:
-      - targets: ['postgres_db:9187']  # If using a postgres_exporter on port 9187
+      - targets: ['postgres_exporter:9187']

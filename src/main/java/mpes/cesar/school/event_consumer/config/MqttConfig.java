@@ -15,7 +15,8 @@ public class MqttConfig {
         try {
             MqttClient client = new MqttClient("tcp://emqx:1883", MqttClient.generateClientId(), new MemoryPersistence());
             MqttConnectOptions options = new MqttConnectOptions();
-            options.setCleanSession(true);
+            options.setAutomaticReconnect(true);
+            options.setConnectionTimeout(10); // Tentar reconectar por 10 segundos
             client.connect(options);
             return client;
         } catch ( MqttException e) {

@@ -1,0 +1,6 @@
+databases:
+  - name: eventdb
+    connection_string: postgresql://user:password@postgres_db:5432/eventdb?sslmode=disable
+
+disable_settings_metrics: false
+auto_discover_databases: true

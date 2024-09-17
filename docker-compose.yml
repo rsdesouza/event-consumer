@@ -26,22 +26,27 @@ services:
       - event_consumer_network
     depends_on:
       - postgres
+    volumes:
+      - ./postgres_exporter.yml:/config/postgres_exporter.yml
+    command:
+      - "--config.file=/config/postgres_exporter.yml"
+
 
   emqx:
     image: emqx/emqx:latest
     container_name: emqx_broker
     environment:
-      - EMQX_NAME=broker
-      - EMQX_LISTENER__TCP__EXTERNAL=1883
-      - EMQX_LISTENER__SSL__EXTERNAL=8883
-      - EMQX_TELEMETRY__PROMETHEUS__ENABLED=true  # Ativar métricas Prometheus
-      - EMQX_TELEMETRY__PROMETHEUS__LISTENER=8080 # Porta para exportar métricas
-      - EMQX_ADMIN_PASSWORD=senha_admin         # Definir senha do administrador
-      - EMQX_ADMIN_USER=admin                   # Definir nome do usuário administrador
+      EMQX_NAME: broker
+      EMQX_LISTENER__TCP__EXTERNAL: 1883
+      EMQX_LISTENER__SSL__EXTERNAL: 8883
+      EMQX_ADMIN_PASSWORD: public              # Definir senha do administrador
+      EMQX_ADMIN_USER: admin                   # Definir nome do usuário administrador
     ports:
       - "1883:1883"
       - "8083:8083"
       - "8080:8080"
+      - "18083:18083"
+
     volumes:
       - emqx_data:/opt/emqx/data
       - emqx_log:/opt/emqx/log
