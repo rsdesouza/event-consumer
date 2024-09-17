@@ -15,6 +15,18 @@ services:
     networks:
       - event_consumer_network
 
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter
+    container_name: postgres_exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://user:password@postgres_db:5432/eventdb?sslmode=disable"
+    ports:
+      - "9187:9187"
+    networks:
+      - event_consumer_network
+    depends_on:
+      - postgres
+
   emqx:
     image: emqx/emqx:latest
     container_name: emqx_broker
@@ -22,6 +34,8 @@ services:
       EMQX_NAME: broker
       EMQX_LISTENER__TCP__EXTERNAL: 1883
       EMQX_LISTENER__SSL__EXTERNAL: 8883
+      EMQX_PROMETHEUS__EXPORTER__ENABLED: "true"  # Ativar métricas Prometheus
+      EMQX_PROMETHEUS__EXPORTER__LISTENER: "8080" # Porta para exportar métricas
     ports:
       - "1883:1883"
       - "8083:8083"
