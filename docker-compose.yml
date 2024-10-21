@@ -31,7 +31,6 @@ services:
     command:
       - "--config.file=/config/postgres_exporter.yml"
 
-
   emqx:
     image: emqx/emqx:latest
     container_name: emqx_broker
@@ -39,14 +38,13 @@ services:
       EMQX_NAME: broker
       EMQX_LISTENER__TCP__EXTERNAL: 1883
       EMQX_LISTENER__SSL__EXTERNAL: 8883
-      EMQX_ADMIN_PASSWORD: public              # Definir senha do administrador
-      EMQX_ADMIN_USER: admin                   # Definir nome do usuário administrador
+      EMQX_ADMIN_PASSWORD: public
+      EMQX_ADMIN_USER: admin
     ports:
       - "1883:1883"
       - "8083:8083"
       - "8080:8080"
       - "18083:18083"
-
     volumes:
       - emqx_data:/opt/emqx/data
       - emqx_log:/opt/emqx/log
@@ -96,11 +94,45 @@ services:
     networks:
       - event_consumer_network
 
+  suricata:
+    image: jasonish/suricata:latest
+    container_name: suricata_ids
+    cap_add:
+      - NET_ADMIN
+      - SYS_NICE
+    networks:
+      - event_consumer_network
+    volumes:
+      - ./suricata_logs:/var/log/suricata  # Expor logs para o host
+      - ./suricata_rules:/etc/suricata/rules  # Montar volume com as regras personalizadas
+    command: suricata -i eth0
+
+  splunk:
+    image: splunk/splunk:latest
+    container_name: splunk_siem
+    environment:
+      SPLUNK_START_ARGS: "--accept-license"
+      SPLUNK_PASSWORD: password
+    ports:
+      - "8000:8000"  # Web interface
+      - "8088:8088"  # HTTP Event Collector (HEC)
+      - "8089:8089"  # Splunk management port
+    volumes:
+      - splunk_data:/opt/splunk/var
+      - /home/rsdesouza/Documentos/monitora-pne-15/event-consumer/suricata_logs:/var/log/suricata  # Caminho dos logs do Suricata
+    networks:
+      - event_consumer_network
+    depends_on:
+      - suricata
+
 volumes:
   postgres_data:
   emqx_data:
   emqx_log:
   grafana_data:
+  splunk_data:
+  suricata_logs:
+  suricata_rules:
 
 networks:
   event_consumer_network:

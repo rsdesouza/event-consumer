@@ -1,0 +1,29 @@
+# Detectar ataque de força bruta SSH
+alert tcp any any -> any 22 (msg:"SSH brute force attempt"; flow:to_server; flags:S; threshold:type limit, track by_src, count 5, seconds 60; classtype:attempted-admin; sid:1000001; rev:1;)
+
+# Detectar varredura de portas
+alert tcp any any -> any any (msg:"Port scan detected"; flags:S; threshold:type limit, track by_src, count 10, seconds 60; classtype:attempted-recon; sid:1000002; rev:1;)
+
+# Detectar tentativa de exploração de SQL Injection
+alert http any any -> any any (msg:"SQL Injection attempt"; content:"UNION SELECT"; nocase; classtype:web-application-attack; sid:1000003; rev:1;)
+
+# Detectar tentativa de acesso a shell reversa
+alert tcp any any -> any 4444 (msg:"Reverse Shell attempt detected"; classtype:shellcode-detect; sid:1000004; rev:1;)
+
+# Detectar tentativa de exploração do Heartbleed
+alert tls any any -> any any (msg:"Heartbleed Vulnerability Exploit"; content:"|18 03 02 00 03 01 40 00|"; classtype:attempted-dos; sid:1000005; rev:1;)
+
+# Detectar DNS tunneling
+alert udp any any -> any 53 (msg:"Possible DNS Tunneling"; content:"|03|vpn"; classtype:attempted-recon; sid:1000006; rev:1;)
+
+# Detectar tentativa de exploração de Shellshock
+alert tcp any any -> any 80 (msg:"Shellshock Vulnerability Exploit Attempt"; content:"() { :; };"; http_header; classtype:web-application-attack; sid:1000007; rev:1;)
+
+# Detectar tentativa de comando remoto via HTTP
+alert http any any -> any any (msg:"Command injection attempt"; content:"wget"; nocase; classtype:web-application-attack; sid:1000008; rev:1;)
+
+# Detectar acesso a site malicioso
+alert http any any -> any any (msg:"Access to known malicious domain"; content:"malicious-domain.com"; classtype:trojan-activity; sid:1000009; rev:1;)
+
+# Tráfego Malicioso MQTT
+alert tcp any any -> any 1883 (msg:"Suspected MQTT attack"; flow:to_server,established; sid:1000004; rev:1;)
